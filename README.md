@@ -75,9 +75,7 @@ UI полностью реализован на HTML/CSS/JS и хостится 
 
 ## Демо
 
-<p align="center">
-  <img src="demo.webm" width="40%">
-</p>
+<video src="https://github.com/user-attachments/assets/8accb445-a198-4f35-b0b9-951ed4ff449a" width="40%" controls></video>
 
 ## Запуск
 
