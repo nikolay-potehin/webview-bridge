@@ -41,6 +41,15 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
   /// be on the same Wi-Fi network as the computer running `server.py`.
   static const String _wsUrl = 'ws://10.0.2.2:8080';
 
+  /// GitHub Pages URL for the WebView content.
+  ///
+  /// Hosted at `https://<username>.github.io/<repo>/` — update with
+  /// your actual GitHub Pages URL after enabling Pages in repo settings
+  /// (Settings → Pages → Source: `main` branch → `/docs` folder).
+  ///
+  /// Falls back to [localHtml] if the URL fails to load.
+  static const String _webUrl = 'https://nikol-github.github.io/webview_bridge/';
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +65,7 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..addJavaScriptChannel('FlutterBridge', onMessageReceived: (message) => _handleWebViewMessage(message.message))
-      ..loadHtmlString(localHtml);
+      ..loadRequest(Uri.parse(_webUrl));
   }
 
   void _handleWebViewMessage(String message) {
@@ -189,8 +198,8 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('WebView + Audio + WebSocket')),
-      body: WebViewWidget(controller: _webViewController),
+      appBar: AppBar(title: const Text('Where Are My Kids')),
+      body: SafeArea(child: WebViewWidget(controller: _webViewController)),
     );
   }
 }
