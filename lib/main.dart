@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:l/l.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+import 'audio_stream_screen.dart';
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+// ignore: experimental_member_use
+void main() => l.capture(
+  () => runApp(const WebViewBridgeApp()),
+  const LogOptions(handlePrint: true, outputInRelease: true, printColors: true),
+);
+
+class WebViewBridgeApp extends StatelessWidget {
+  const WebViewBridgeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return const MaterialApp(title: 'WebView Bridge PoC', home: AudioStreamScreen());
   }
 }

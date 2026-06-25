@@ -268,6 +268,43 @@ inputNode?.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buf
 
 ---
 
+## Local WebSocket Server
+
+A simplistic Python WebSocket echo server is included in the `server/` folder. It receives raw PCM audio bytes from the Flutter app and echoes them back, logging statistics about the data flow.
+
+### Setup
+
+```bash
+cd server
+python -m venv venv
+
+# Activate the virtual environment:
+#   Windows (PowerShell):
+. venv\Scripts\Activate.ps1
+#   macOS / Linux:
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### Run
+
+```bash
+python server.py
+# Defaults: ws://0.0.0.0:8080
+# Override host/port:
+python server.py --host 0.0.0.0 --port 8080
+```
+
+### Connect from Flutter
+
+Update the WebSocket URL in `lib/audio_stream_screen.dart`:
+
+- **Emulator**: `ws://10.0.2.2:8080` (Android emulator maps this to the host machine's `localhost`)
+- **Physical device**: `ws://<your-computer-ip>:8080` (both device and computer must be on the same network)
+
+---
+
 ## Future Enhancements
 
 - **Audio codec** (Opus) to reduce bandwidth.
