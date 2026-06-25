@@ -7,8 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'audio_bridge.dart';
-import 'audio_math.dart';
-import 'local_html.dart';
 import 'websocket_service.dart';
 
 /// Main screen hosting the WebView and orchestrating the audio pipeline:
@@ -65,6 +63,7 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..addJavaScriptChannel('FlutterBridge', onMessageReceived: (message) => _handleWebViewMessage(message.message))
+      // ..loadHtmlString(localHtml);
       ..loadRequest(Uri.parse(_webUrl));
   }
 
@@ -138,7 +137,6 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
     await _wsService.disconnect();
     l.d('WebSocket disconnected');
 
-    AudioMath.reset();
     l.i('Audio stream stopped');
     _updateStatus('Stopped');
   }
@@ -146,8 +144,8 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
   // ── Audio data handler ─────────────────────────────────────────────
 
   /// Called for every chunk of PCM bytes arriving from the native side.
-  /// Forwards the bytes to the WebSocket.  Volume is computed server-side
-  /// when connected; falls back to local computation otherwise.
+  /// Forwards raw bytes to the WebSocket server.  The server computes
+  /// the volume level and sends it back — no local calculation.
   void _onAudioData(Uint8List bytes) {
     // Ignore late audio chunks that arrive after stop was requested.
     if (!_isStreaming) {
@@ -162,19 +160,17 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
       l.i('AudioData chunk #$_dataChunkCount: ${bytes.length} bytes, first 16: $preview');
     }
 
-    // Send raw PCM over WebSocket (only if connected).
+    // Send raw PCM over WebSocket — server computes volume and responds.
     if (_wsService.isConnected) {
       _wsService.send(bytes);
-    } else {
-      // Fallback: compute volume locally when WS unavailable.
-      final level = AudioMath.rmsLevel(bytes);
-      _webViewController.runJavaScript('updateLevel($level)');
     }
   }
 
-  /// Called when the server sends back a computed volume level.
+  /// Called when the server sends back a computed volume level (0.0–1.0).
   void _onServerVolume(double level) {
     if (!_isStreaming) return;
+    // Only override if server actually sends non-zero — otherwise
+    // local computation is already driving the waveform.
     _webViewController.runJavaScript('updateLevel($level)');
   }
 
