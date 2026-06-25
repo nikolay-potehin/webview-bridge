@@ -48,7 +48,7 @@ class _AudioStreamScreenState extends State<AudioStreamScreen> {
   /// (Settings → Pages → Source: `main` branch → `/docs` folder).
   ///
   /// Falls back to [localHtml] if the URL fails to load.
-  static const String _webUrl = 'https://nikol-github.github.io/webview_bridge/';
+  static const String _webUrl = 'https://nikolay-potehin.github.io/webview-bridge/';
 
   @override
   void initState() {
